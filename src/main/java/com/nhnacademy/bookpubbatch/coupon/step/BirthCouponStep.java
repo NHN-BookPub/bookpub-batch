@@ -66,7 +66,7 @@ public class BirthCouponStep {
         return new JdbcBatchItemWriterBuilder<BirthMemberDto>()
                 .dataSource(dataSource)
                 .sql("insert into coupon(coupon_template_number, member_number, coupon_used)  "
-                        + "values (60, ?, false)")
+                        + "values (1, ?, false)")
                 .itemPreparedStatementSetter(new BirthdayMemberDtoPreparedStatementSetter())
                 .build();
     }
