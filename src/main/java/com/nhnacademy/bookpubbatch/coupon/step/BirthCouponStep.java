@@ -104,7 +104,8 @@ public class BirthCouponStep {
 
         factoryBean.setSelectClause("select member_number, member_birth_month");
         factoryBean.setFromClause("from member");
-        factoryBean.setWhereClause("where member_birth_month = " + birthDay);
+        factoryBean.setWhereClause("where member_birth_month = " + birthDay
+                + " and member_deleted= 0 and member_blocked = 0");
         factoryBean.setSortKey("member_number");
         factoryBean.setDataSource(dataSource);
 
