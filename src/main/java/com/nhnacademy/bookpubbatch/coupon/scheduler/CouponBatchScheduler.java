@@ -1,6 +1,7 @@
 package com.nhnacademy.bookpubbatch.coupon.scheduler;
 
 import com.nhnacademy.bookpubbatch.coupon.config.CouponBatchConfig;
+import com.nhnacademy.bookpubbatch.coupon.scheduler.exception.CouponBatchSchedulerException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import lombok.RequiredArgsConstructor;
@@ -30,22 +31,22 @@ public class CouponBatchScheduler {
     private final CouponBatchConfig couponBatchConfig;
 
     /**
-     * 매일 자정 0시 10분에 쿠폰 배치가 실행됩니다.
+     * 매일 새벽 1시 00분에 쿠폰 배치가 실행됩니다.
      */
-    @Scheduled(cron = "0 10 0 * * ?")
+    @Scheduled(cron = "0 0 1 * * *", zone = "Asia/Seoul")
     public void runCouponBatchJob() {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         try {
             JobParameters jobParameters = new JobParametersBuilder()
-                    .addString("time", dateFormat.format(calendar.getTime()))
+                    .addString("CouponJobTime", dateFormat.format(calendar.getTime()))
                     .toJobParameters();
-            log.info("BirthDay Coupon Scheduler : " + jobParameters.getString("time"));
+            log.info("BirthDay Coupon Scheduler : " + jobParameters.getString("CouponJobTime"));
             jobLauncher.run(couponBatchConfig.birthCouponJob(), jobParameters);
         } catch (JobExecutionAlreadyRunningException | JobInstanceAlreadyCompleteException
                  | JobParametersInvalidException | JobRestartException e) {
-            log.error(e.getMessage());
+            throw new CouponBatchSchedulerException(e.getMessage());
         }
     }
 
