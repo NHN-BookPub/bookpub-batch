@@ -62,7 +62,7 @@ public class BirthCouponStep {
      * @param dataSource dataSource.
      * @return ItemWriter.
      */
-    public JdbcBatchItemWriter<BirthMemberDto> writer(DataSource dataSource) {
+    public JdbcBatchItemWriter<BirthMemberDto> birthMemberDtoItemWriter(DataSource dataSource) {
         return new JdbcBatchItemWriterBuilder<BirthMemberDto>()
                 .dataSource(dataSource)
                 .sql("insert into coupon(coupon_template_number, member_number, coupon_used)  "
@@ -83,7 +83,7 @@ public class BirthCouponStep {
         return stepBuilderFactory.get("sendBirthCouponStep")
                 .<BirthMemberDto, BirthMemberDto>chunk(1000)
                 .reader(birthMemberDtoItemReader(dataSource))
-                .writer(writer(dataSource))
+                .writer(birthMemberDtoItemWriter(dataSource))
                 .build();
 
     }
@@ -104,7 +104,8 @@ public class BirthCouponStep {
 
         factoryBean.setSelectClause("select member_number, member_birth_month");
         factoryBean.setFromClause("from member");
-        factoryBean.setWhereClause("where member_birth_month = " + birthDay);
+        factoryBean.setWhereClause("where member_birth_month = " + birthDay
+                + " and member_deleted= 0 and member_blocked = 0");
         factoryBean.setSortKey("member_number");
         factoryBean.setDataSource(dataSource);
 
