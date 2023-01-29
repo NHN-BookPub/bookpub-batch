@@ -33,7 +33,7 @@ public class CouponBatchScheduler {
     /**
      * 매일 새벽 1시 00분에 쿠폰 배치가 실행됩니다.
      */
-    @Scheduled(cron = "0 0 1 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 10 12 * * *", zone = "Asia/Seoul")
     public void runCouponBatchJob() {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
