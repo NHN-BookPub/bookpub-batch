@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nhnacademy.bookpubbatch.repository.coupon.CouponMapper">
+    <select id="getCoupons" resultType="com.nhnacademy.bookpubbatch.repository.coupon.dto.CouponDto">
+        select distinct c.coupon_number as 'couponNo'
+        from coupon as c
+                 left join bookpub_order as o
+                           on c.order_number = o.order_number
+                 inner join order_state_code osc on o.order_state_code_number = osc.order_state_code_number
+        where osc.order_state_code_name = '결제대기'
+          and now() >= (o.created_at + interval 1 day)
+         LIMIT #{_skiprows}, #{_pagesize}
+
+    </select>
+    <update id="updateCoupons" parameterType="com.nhnacademy.bookpubbatch.repository.coupon.dto.CouponUpdateDto" >
+        update coupon set order_number = null,
+                          order_product_number = null,
+                          coupon_used = false,
+                          coupon_used_at = null
+        where coupon_number = ${couponNo}
+    </update>
+</mapper>
