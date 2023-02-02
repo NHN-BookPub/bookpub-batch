@@ -7,7 +7,6 @@ import com.nhnacademy.bookpubbatch.repository.member.dto.MemberDto;
 import com.nhnacademy.bookpubbatch.repository.member.dto.MemberPromotionDto;
 import com.nhnacademy.bookpubbatch.repository.tier.dto.TierDto;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.JobExecution;
@@ -41,13 +40,11 @@ public class PromotionProcessor implements ItemProcessor<MemberDto, MemberPromot
 
     @BeforeStep
     public void retrieve(StepExecution stepExecution) {
-        log.warn("데이터 가공 시작");
         ObjectMapper mapper = new ObjectMapper();
         JobExecution jobExecution = stepExecution.getJobExecution();
 
         tiers = mapper.convertValue(jobExecution.getExecutionContext().get("tiers"), TypeFactory.defaultInstance()
                 .constructCollectionType(List.class, TierDto.class));
-        log.warn("가공된 데이터 :", tiers.size());
     }
 
 }
