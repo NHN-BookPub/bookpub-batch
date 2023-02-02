@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nhnacademy.bookpubbatch.repository.tier.TierMapper">
+    <select id="getTiers" resultType="com.nhnacademy.bookpubbatch.repository.tier.dto.TierDto">
+        select t.tier_number as 'tierNo',
+               t.tier_price as 'tierPrice',
+               t.tier_point as 'tierPoint'
+        from tier as t
+        order by t.tier_price desc
+        LIMIT #{_skiprows}, #{_pagesize}
+    </select>
+</mapper>

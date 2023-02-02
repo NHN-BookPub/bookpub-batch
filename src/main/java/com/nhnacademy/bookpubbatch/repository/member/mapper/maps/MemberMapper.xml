@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nhnacademy.bookpubbatch.repository.member.MemberMapper">
+    <select id="getMembers" resultType="com.nhnacademy.bookpubbatch.repository.member.dto.MemberDto">
+        select m.member_number                                                                        as 'memberNo',
+                m.member_point                                                                         as 'memberPoint',
+                sum(op.order_product_amount * op.order_product_price - op.order_product_coupon_amount) as 'totalPrice'
+        from member as m
+                 inner join `bookpub_order` as o
+                            on o.member_number = m.member_number
+                 inner join order_and_product as op
+                            on op.order_number = o.order_number
+                 inner join order_product_state_code as opsc
+                            on opsc.order_product_state_code_number = op.order_product_code_number
+        where o.created_at between LAST_DAY(NOW() - interval 1 month)
+            and LAST_DAY(NOW())
+          and opsc.order_product_state_code_name = '구매확정'
+        group by m.member_number
+        LIMIT #{_skiprows}, #{_pagesize}
+    </select>
+    <update id="updateMembers" parameterType="com.nhnacademy.bookpubbatch.repository.member.dto.MemberDto" >
+        update member set tier_number = #{tierNo} ,
+                          member_point = member_point + #{point}
+        where member_number = #{memberNo}
+    </update>
+</mapper>
