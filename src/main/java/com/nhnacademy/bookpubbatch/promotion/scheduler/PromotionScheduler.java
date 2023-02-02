@@ -28,7 +28,7 @@ public class PromotionScheduler {
      * 0 0 11 L * ?  <-- 원래넣어야할  값
      * 테스트용으로 매일 12시에 진행
      */
-    @Scheduled(cron = "0 0 12 * * ?")
+    @Scheduled(cron = "55 23 * * *")
     public void runCouponBatchJob() {
 
         try {

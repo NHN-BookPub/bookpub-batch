@@ -23,7 +23,7 @@
     </select>
     <update id="updateMembers" parameterType="com.nhnacademy.bookpubbatch.repository.member.dto.MemberDto" >
         update member set tier_number = #{tierNo} ,
-                          member_point = member_point + #{memberNo}
+                          member_point = member_point + #{point}
         where member_number = #{memberNo}
     </update>
 </mapper>
