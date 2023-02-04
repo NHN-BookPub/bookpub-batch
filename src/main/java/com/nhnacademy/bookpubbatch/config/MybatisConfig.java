@@ -2,10 +2,14 @@ package com.nhnacademy.bookpubbatch.config;
 
 
 import com.nhnacademy.bookpubbatch.repository.coupon.dto.CouponDto;
+import com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryResponseDto;
+import com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryShippingResponseDto;
+import com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryStateDto;
 import com.nhnacademy.bookpubbatch.repository.member.dto.MemberDto;
 import com.nhnacademy.bookpubbatch.repository.order.dto.OrderDto;
 import com.nhnacademy.bookpubbatch.repository.order.dto.OrderStateDto;
 import com.nhnacademy.bookpubbatch.repository.tier.dto.TierDto;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.batch.core.repository.ExecutionContextSerializer;
@@ -13,6 +17,7 @@ import org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStr
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -25,7 +30,7 @@ import java.io.IOException;
  * @since : 1.0
  **/
 @Configuration
-@MapperScan(basePackages = "**.mapper.**", sqlSessionFactoryRef = "sqlSessionFactoryBean")
+@MapperScan(basePackages = "**.mapper.**", sqlSessionFactoryRef = "sqlSessionFactory")
 public class MybatisConfig {
 
     /**
@@ -35,13 +40,14 @@ public class MybatisConfig {
      * @return the sql session factory bean
      * @throws IOException the io exception
      */
+    @Primary
     @Bean
-    public SqlSessionFactoryBean sqlSessionFactoryBean(@Qualifier("shopDb") DataSource dataSource) throws IOException {
+    public SqlSessionFactory sqlSessionFactory(@Qualifier("shopDb") DataSource dataSource) throws Exception {
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
         sessionFactory.setDataSource(dataSource);
         sessionFactory.setMapperLocations(resolver.getResources("classpath*:**/maps/*.xml"));
-        return sessionFactory;
+        return sessionFactory.getObject();
     }
 
     /**
@@ -55,7 +61,10 @@ public class MybatisConfig {
                 TierDto.class.getName(),
                 OrderDto.class.getName(),
                 OrderStateDto.class.getName(),
-                CouponDto.class.getName());
+                CouponDto.class.getName(),
+                DeliveryStateDto.class.getName(),
+                DeliveryResponseDto.class.getName(),
+                DeliveryShippingResponseDto.class.getName());
     }
 
 }
