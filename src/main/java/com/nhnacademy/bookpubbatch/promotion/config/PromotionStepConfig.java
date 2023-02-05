@@ -84,6 +84,7 @@ public class PromotionStepConfig {
      *
      * @return 데이터 공유에 필요한 key 값을 가진 ExecutionContextPromotionListener 가 반환 됩니다.
      */
+    @JobScope
     @Bean
     public ExecutionContextPromotionListener promotionListener() {
         ExecutionContextPromotionListener executionContextPromotionListener =

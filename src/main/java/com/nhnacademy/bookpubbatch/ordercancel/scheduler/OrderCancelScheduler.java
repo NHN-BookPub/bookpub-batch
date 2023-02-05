@@ -29,7 +29,7 @@ public class OrderCancelScheduler {
     /**
      * 매일 23시 58분에 돌아갑니다.
      */
-    @Scheduled(cron = "58 23 * * *")
+    @Scheduled(cron = "50 58 23 * * *")
     public void runOrderCancel() {
         try {
             JobParameters jobParameters = new JobParametersBuilder().toJobParameters();

@@ -19,6 +19,7 @@ public class DataSourceConfig {
 
     private final BatchPropertiesConfig batchProperties;
     private final ShopPropertiesConfig shopProperties;
+    private final DeliveryPropertiesConfig deliveryProperties;
 
     /**
      * spring batch에 대한 데이터소스입니다.
@@ -42,6 +43,14 @@ public class DataSourceConfig {
     @Bean("shopDb")
     DataSource shopDb() {
         return shopProperties.shopDataSourceProperties()
+                .initializeDataSourceBuilder()
+                .type(HikariDataSource.class)
+                .build();
+    }
+
+    @Bean("deliveryDb")
+    DataSource deliveryDb(){
+        return deliveryProperties.deliveryProperties()
                 .initializeDataSourceBuilder()
                 .type(HikariDataSource.class)
                 .build();
