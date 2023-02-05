@@ -14,7 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
- * Some description here.
+ * 배송관련 스케줄러입니다.
  *
  * @author : 유호철
  * @since : 1.0
