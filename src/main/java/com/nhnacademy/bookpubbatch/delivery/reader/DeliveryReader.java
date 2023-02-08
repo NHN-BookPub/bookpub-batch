@@ -3,6 +3,7 @@ package com.nhnacademy.bookpubbatch.delivery.reader;
 import com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryResponseDto;
 import com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryShippingResponseDto;
 import com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryStateDto;
+import com.nhnacademy.bookpubbatch.repository.order.dto.OrderDto;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.batch.MyBatisPagingItemReader;
 import org.mybatis.spring.batch.builder.MyBatisPagingItemReaderBuilder;
@@ -19,10 +20,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DeliveryReader {
     private final SqlSessionFactory sqlSessionFactory;
+    private final SqlSessionFactory shopSessionFactory;
     private static final Integer PAGE_SIZE = 10;
 
-    public DeliveryReader(@Qualifier("deliverySqlSessionFactory") SqlSessionFactory sqlSessionFactoryBean) {
+    public DeliveryReader(@Qualifier("deliverySqlSessionFactory") SqlSessionFactory sqlSessionFactoryBean,
+                          @Qualifier("sqlSessionFactory") SqlSessionFactory sqlSessionFactory) {
         this.sqlSessionFactory = sqlSessionFactoryBean;
+        this.shopSessionFactory = sqlSessionFactory;
     }
 
     /**
@@ -63,6 +67,34 @@ public class DeliveryReader {
         return new MyBatisPagingItemReaderBuilder<DeliveryShippingResponseDto>()
                 .sqlSessionFactory(sqlSessionFactory)
                 .queryId("com.nhnacademy.bookpubbatch.repository.delivery.DeliveryMapper.getDeliveryByShipping")
+                .pageSize(PAGE_SIZE)
+                .build();
+    }
+
+    /**
+     * 배송대기인 주문정보를 읽어오는 메서드입니다.
+     *
+     * @return the my batis paging item reader
+     */
+    @Bean
+    public MyBatisPagingItemReader<OrderDto> deliveryOrderStateReadyReader() {
+        return new MyBatisPagingItemReaderBuilder<OrderDto>()
+                .sqlSessionFactory(shopSessionFactory)
+                .queryId("com.nhnacademy.bookpubbatch.repository.order.OrderMapper.getOrderDeliveryReady")
+                .pageSize(PAGE_SIZE)
+                .build();
+    }
+
+    /**
+     * 배송중인 주문정보를 읽어오는 메서드입니다.
+     *
+     * @return the my batis paging item reader
+     */
+    @Bean
+    public MyBatisPagingItemReader<OrderDto> deliveryOrderStateDoneReader() {
+        return new MyBatisPagingItemReaderBuilder<OrderDto>()
+                .sqlSessionFactory(shopSessionFactory)
+                .queryId("com.nhnacademy.bookpubbatch.repository.order.OrderMapper.getOrderDeliveryShipping")
                 .pageSize(PAGE_SIZE)
                 .build();
     }

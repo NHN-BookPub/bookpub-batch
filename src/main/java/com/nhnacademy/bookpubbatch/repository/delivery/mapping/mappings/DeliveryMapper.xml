@@ -8,54 +8,62 @@
         select delivery_state_number as 'deliveryStateNo'
         from delivery_state
         where delivery_state_name = '배송중'
-            LIMIT #{_skiprows}
-            , #{_pagesize}
+        LIMIT #{_skiprows} , #{_pagesize}
     </select>
-    <select id="getDeliveryByReady" resultType="com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryResponseDto">
+    <select id="getDeliveryByReady"
+            resultType="com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryResponseDto">
         select delivery.delivery_number as 'deliveryNo'
         from delivery
                  left join delivery_state ds
                            on delivery.delivery_state_number = ds.delivery_state_number
         <![CDATA[
         where delivery_state_name = '배송준비'
-          and delivery.delivery_request_date + interval 3 day <= now()
+          and delivery.delivery_request_date + interval 3 day >= now()
         ]]>
+        LIMIT #{_skiprows} , #{_pagesize}
+
     </select>
-    <insert id="createDeliveryLocation" parameterType="com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryResponseDto">
-        insert
-        delivery_location
+    <insert id="createDeliveryLocation"
+            parameterType="com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryResponseDto">
+        insert delivery_location
         values (null, #{deliveryNo}, '옥천허브', now())
     </insert>
 
-    <insert id="createDeliveryLocationEnd" parameterType="com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryShippingResponseDto">
-        insert
-        delivery_location
-        values(null, #{deliveryNo}, #{address}, now())
+    <insert id="createDeliveryLocationEnd"
+            parameterType="com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryShippingResponseDto">
+        insert delivery_location
+        values (null, #{deliveryNo}, #{address}, now())
     </insert>
 
-    <update id="updateDeliveryState" parameterType="com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryUpdateDto">
-        update delivery set delivery_state_number = #{stateNo}
-        where delivery_number= #{deliveryNo}
+    <update id="updateDeliveryState"
+            parameterType="com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryUpdateDto">
+        update delivery
+        set delivery_state_number = #{stateNo}
+        where delivery_number = #{deliveryNo}
     </update>
-    <update id="updateDeliveryEnd" parameterType="com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryShippingResponseDto">
+
+    <update id="updateDeliveryEnd"
+            parameterType="com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryShippingResponseDto">
         update delivery
         set delivery_state_number =
                 (select delivery_state_number
                  from delivery_state
                  where delivery_state_name = '배송완료'),
-            delivery_finished_at = now()
+            delivery_finished_at  = now()
         where delivery_number = #{deliveryNo}
     </update>
 
-    <select id="getDeliveryByShipping" resultType="com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryShippingResponseDto">
-        select delivery.delivery_number as 'deliveryNo',
-                delivery.delivery_address_detail as 'address'
+    <select id="getDeliveryByShipping"
+            resultType="com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryShippingResponseDto">
+        select delivery.delivery_number         as 'deliveryNo',
+               delivery.delivery_address_detail as 'address'
         from delivery
                  left join delivery_state ds
                            on delivery.delivery_state_number = ds.delivery_state_number
         <![CDATA[
         where delivery_state_name = '배송중'
-          and delivery.delivery_request_date + interval 1 day <= now()
+          and delivery.delivery_request_date + interval 1 day >= now()
         ]]>
+        LIMIT #{_skiprows} , #{_pagesize}
     </select>
 </mapper>

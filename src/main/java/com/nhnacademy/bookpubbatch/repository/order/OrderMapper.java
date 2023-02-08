@@ -18,4 +18,12 @@ public interface OrderMapper {
     OrderStateDto getOrderStates();
 
     void updateOrderCancel(OrderUpdateDto orderUpdate);
+
+    List<OrderDto> getOrderDeliveryReady();
+
+    List<OrderDto> getOrderDeliveryShipping();
+
+    void updateOrderShipping(OrderDto dto);
+
+    void updateOrderDone(OrderDto dto);
 }

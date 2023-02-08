@@ -9,6 +9,7 @@ import com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryResponseDto;
 import com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryShippingResponseDto;
 import com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryStateDto;
 import com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryUpdateDto;
+import com.nhnacademy.bookpubbatch.repository.order.dto.OrderDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobScope;
@@ -42,7 +43,7 @@ public class DeliveryStepConfig {
      */
     @JobScope
     @Bean
-    public Step deliveryStateInfo(){
+    public Step deliveryStateInfo() {
         return stepBuilderFactory.get("배송 상태정보가져오기")
                 .<DeliveryStateDto, DeliveryStateDto>chunk(1)
                 .reader(reader.deliveryStateReader())
@@ -62,7 +63,7 @@ public class DeliveryStepConfig {
      */
     @JobScope
     @Bean
-    public Step deliveryLocationCreate(){
+    public Step deliveryLocationCreate() {
         return stepBuilderFactory.get("배송 지역 추가")
                 .<DeliveryResponseDto, DeliveryResponseDto>chunk(CHUNK_SIZE)
                 .reader(reader.deliveryStateReadyReader())
@@ -78,12 +79,43 @@ public class DeliveryStepConfig {
      */
     @JobScope
     @Bean
-    public Step deliveryLocationUpdate(){
+    public Step deliveryLocationUpdate() {
         return stepBuilderFactory.get("배송 : 배송준비 -> 배송중으로 변경")
                 .<DeliveryResponseDto, DeliveryUpdateDto>chunk(CHUNK_SIZE)
                 .reader(reader.deliveryStateReadyReader())
                 .processor(processor)
                 .writer(writer.updateDeliveryState())
+                .listener(loggingListener)
+                .build();
+    }
+
+    /**
+     * 주문의 배송준비
+     *
+     * @return the step
+     */
+    @Bean
+    public Step orderStateShippingUpdate() {
+        return stepBuilderFactory.get("배송시 : 배송대기 -> 배송중으로 변경")
+                .<OrderDto, OrderDto>chunk(CHUNK_SIZE)
+                .reader(reader.deliveryOrderStateReadyReader())
+                .writer(writer.updateOrderDeliveryReadyToShipping())
+                .listener(loggingListener)
+                .build();
+
+    }
+
+    /**
+     * 배송중인 주문의 정보를 배송완료로 변경하는 메서드입니다.
+     *
+     * @return the step
+     */
+    @Bean
+    public Step orderStateDoneUpdate(){
+        return stepBuilderFactory.get("배송중 : 배송중 -> 배송완료")
+                .<OrderDto, OrderDto>chunk(CHUNK_SIZE)
+                .reader(reader.deliveryOrderStateDoneReader())
+                .writer(writer.updateOrderDeliveryShippingToDone())
                 .listener(loggingListener)
                 .build();
     }
@@ -95,7 +127,7 @@ public class DeliveryStepConfig {
      */
     @JobScope
     @Bean
-    public Step deliveryStateEnd(){
+    public Step deliveryStateEnd() {
         return stepBuilderFactory.get("배송 지역 배송완료")
                 .<DeliveryShippingResponseDto, DeliveryShippingResponseDto>chunk(CHUNK_SIZE)
                 .reader(reader.deliveryStateShippingReader())
@@ -111,7 +143,7 @@ public class DeliveryStepConfig {
      */
     @JobScope
     @Bean
-    public Step deliveryStateEndUpdate(){
+    public Step deliveryStateEndUpdate() {
         return stepBuilderFactory.get("배송 배송완료로 변경")
                 .<DeliveryShippingResponseDto, DeliveryShippingResponseDto>chunk(CHUNK_SIZE)
                 .reader(reader.deliveryStateShippingReader())
@@ -119,6 +151,7 @@ public class DeliveryStepConfig {
                 .listener(loggingListener)
                 .build();
     }
+
     /**
      * 데이터 공유를 위한 Listener
      *

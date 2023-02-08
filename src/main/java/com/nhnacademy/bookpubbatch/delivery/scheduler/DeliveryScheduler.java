@@ -30,7 +30,7 @@ public class DeliveryScheduler {
      * 배송준비 -> 배송중 변경
      *
      */
-    @Scheduled(cron = "55 10 * * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0/30 * * * * *", zone = "Asia/Seoul")
     public void runDeliveryState() {
         try {
             JobParameters jobParameters = new JobParametersBuilder()
@@ -46,7 +46,7 @@ public class DeliveryScheduler {
      * 배송중 -> 배송완료 변경
      *
      */
-    @Scheduled(cron = "56 10 * * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0/30 * * * * *", zone = "Asia/Seoul")
     public void runDeliveryFinish(){
         try {
             JobParameters jobParameters = new JobParametersBuilder()
