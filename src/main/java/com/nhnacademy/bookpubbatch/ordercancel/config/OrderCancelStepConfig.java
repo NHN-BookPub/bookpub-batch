@@ -19,6 +19,7 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.listener.ExecutionContextPromotionListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.DeadlockLoserDataAccessException;
 
 /**
  * 결제대기 상태값들이 주문취소로 변경되었을때 일어나는 상황에대한 Step Config 입니다.
@@ -51,9 +52,10 @@ public class OrderCancelStepConfig {
         return stepBuilderFactory.get("결제대기상태 상태값 조회")
                 .<OrderStateDto, OrderStateDto>chunk(CHUNK_SIZE)
                 .reader(reader.getOrderStateReader())
-                .listener(loggingListener)
                 .writer(executionWriter)
-                .listener(loggingListener)
+                .faultTolerant()
+                .retryLimit(3)
+                .retry(DeadlockLoserDataAccessException.class)
                 .listener(orderCancelListener())
                 .build();
     }
@@ -69,10 +71,11 @@ public class OrderCancelStepConfig {
         return stepBuilderFactory.get("결제대기 상태 변경")
                 .<OrderDto, OrderUpdateDto>chunk(CHUNK_SIZE)
                 .reader(reader.getOrderReader())
-                .listener(loggingListener)
                 .processor(orderUpdateProcessor)
-                .listener(loggingListener)
                 .writer(writer.updateOrderWriter())
+                .faultTolerant()
+                .retryLimit(3)
+                .retry(DeadlockLoserDataAccessException.class)
                 .listener(loggingListener)
                 .build();
     }
@@ -88,10 +91,11 @@ public class OrderCancelStepConfig {
         return stepBuilderFactory.get("사용한쿠폰 사용가능으로 변경")
                 .<CouponDto,CouponUpdateDto>chunk(CHUNK_SIZE)
                 .reader(reader.getCouponReader())
-                .listener(loggingListener)
                 .processor(couponUpdateProcessor)
-                .listener(loggingListener)
                 .writer(writer.updateCouponWriter())
+                .faultTolerant()
+                .retryLimit(3)
+                .retry(DeadlockLoserDataAccessException.class)
                 .listener(loggingListener)
                 .build();
     }

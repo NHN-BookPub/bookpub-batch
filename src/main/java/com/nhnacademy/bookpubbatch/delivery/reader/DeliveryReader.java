@@ -4,6 +4,7 @@ import com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryResponseDto;
 import com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryShippingResponseDto;
 import com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryStateDto;
 import com.nhnacademy.bookpubbatch.repository.order.dto.OrderDto;
+import com.nhnacademy.bookpubbatch.repository.orderproduct.dto.OrderProductDto;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.batch.MyBatisPagingItemReader;
 import org.mybatis.spring.batch.builder.MyBatisPagingItemReaderBuilder;
@@ -16,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author : 유호철
  * @since : 1.0
- **/
+ */
 @Configuration
 public class DeliveryReader {
     private final SqlSessionFactory sqlSessionFactory;
@@ -95,6 +96,49 @@ public class DeliveryReader {
         return new MyBatisPagingItemReaderBuilder<OrderDto>()
                 .sqlSessionFactory(shopSessionFactory)
                 .queryId("com.nhnacademy.bookpubbatch.repository.order.OrderMapper.getOrderDeliveryShipping")
+                .pageSize(PAGE_SIZE)
+                .build();
+    }
+
+    /**
+     * 배송대기인 주문상품의 정보를 읽어오는 메서드입니다.
+     *
+     * @return Reader 반환.
+     */
+    @Bean
+    public MyBatisPagingItemReader<OrderProductDto> deliveryOrderProductStateReadyReader(){
+        return new MyBatisPagingItemReaderBuilder<OrderProductDto>()
+                .sqlSessionFactory(shopSessionFactory)
+                .queryId("com.nhnacademy.bookpubbatch.repository.orderproduct.OrderProductMapper.getOrderProductDeliveryReady")
+                .pageSize(PAGE_SIZE)
+                .build();
+    }
+
+
+    /**
+     * 배송중인 주문상품의 정보를 읽어오는 메서드입니다.
+     *
+     * @return Reader 반환.
+     */
+    @Bean
+    public MyBatisPagingItemReader<OrderProductDto> deliveryOrderProductStateShipping() {
+        return new MyBatisPagingItemReaderBuilder<OrderProductDto>()
+                .sqlSessionFactory(shopSessionFactory)
+                .queryId("com.nhnacademy.bookpubbatch.repository.orderproduct.OrderProductMapper.getOrderProductDeliveryShipping")
+                .pageSize(PAGE_SIZE)
+                .build();
+    }
+
+    /**
+     * 구매확정 대기 + 7일 상품 읽어오기.
+     *
+     * @return the my batis paging item reader
+     */
+    @Bean
+    public MyBatisPagingItemReader<OrderProductDto> orderProductStateWaitingReader() {
+        return new MyBatisPagingItemReaderBuilder<OrderProductDto>()
+                .sqlSessionFactory(shopSessionFactory)
+                .queryId("com.nhnacademy.bookpubbatch.repository.orderproduct.OrderProductMapper.getOrderProductWaitingPurchase")
                 .pageSize(PAGE_SIZE)
                 .build();
     }

@@ -8,6 +8,7 @@ import com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryStateDto;
 import com.nhnacademy.bookpubbatch.repository.member.dto.MemberDto;
 import com.nhnacademy.bookpubbatch.repository.order.dto.OrderDto;
 import com.nhnacademy.bookpubbatch.repository.order.dto.OrderStateDto;
+import com.nhnacademy.bookpubbatch.repository.orderproduct.dto.OrderProductDto;
 import com.nhnacademy.bookpubbatch.repository.tier.dto.TierDto;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -64,7 +65,8 @@ public class MybatisConfig {
                 CouponDto.class.getName(),
                 DeliveryStateDto.class.getName(),
                 DeliveryResponseDto.class.getName(),
-                DeliveryShippingResponseDto.class.getName());
+                DeliveryShippingResponseDto.class.getName(),
+                OrderProductDto.class.getName());
     }
 
 }

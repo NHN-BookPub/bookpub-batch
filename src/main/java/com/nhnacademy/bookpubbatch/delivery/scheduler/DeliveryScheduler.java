@@ -30,7 +30,7 @@ public class DeliveryScheduler {
      * 배송준비 -> 배송중 변경
      *
      */
-    @Scheduled(cron = "0/30 * * * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0/10 * * * *", zone = "Asia/Seoul")
     public void runDeliveryState() {
         try {
             JobParameters jobParameters = new JobParametersBuilder()
@@ -46,12 +46,29 @@ public class DeliveryScheduler {
      * 배송중 -> 배송완료 변경
      *
      */
-    @Scheduled(cron = "0/30 * * * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0/11 * * * *", zone = "Asia/Seoul")
     public void runDeliveryFinish(){
         try {
             JobParameters jobParameters = new JobParametersBuilder()
                     .toJobParameters();
             jobLauncher.run(deliveryJobConfig.deliveryEnd(), jobParameters);
+        } catch (JobExecutionAlreadyRunningException | JobInstanceAlreadyCompleteException
+                 | JobParametersInvalidException | JobRestartException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+
+    /**
+     * 구매확정대기 -> 구매확정 변경
+     *
+     */
+    @Scheduled(cron = "0 55 11 * * *", zone = "Asia/Seoul")
+    public void runOrderPurchaseToDone(){
+        try {
+            JobParameters jobParameters = new JobParametersBuilder()
+                    .toJobParameters();
+            jobLauncher.run(deliveryJobConfig.purchaseWaitingToDone(), jobParameters);
         } catch (JobExecutionAlreadyRunningException | JobInstanceAlreadyCompleteException
                  | JobParametersInvalidException | JobRestartException e) {
             log.error(e.getMessage());
