@@ -27,10 +27,11 @@ public class DeliveryJobConfig {
      */
     @Bean
     public Job deliveryLocation(){
-        return jobBuilderFactory.get("deliveryLocation-test"+ LocalDateTime.now())
+        return jobBuilderFactory.get("deliveryLocation"+ LocalDateTime.now())
                 .start(deliveryStepConfig.deliveryStateInfo())
                 .next(deliveryStepConfig.deliveryLocationCreate())
                 .next(deliveryStepConfig.deliveryLocationUpdate())
+                .next(deliveryStepConfig.orderStateShippingUpdate())
                 .build();
     }
 
@@ -42,9 +43,10 @@ public class DeliveryJobConfig {
      */
     @Bean
     public Job deliveryEnd(){
-        return jobBuilderFactory.get("delvieryEnd-test" + LocalDateTime.now())
+        return jobBuilderFactory.get("delvieryEnd" + LocalDateTime.now())
                 .start(deliveryStepConfig.deliveryStateEnd())
                 .next(deliveryStepConfig.deliveryStateEndUpdate())
+                .next(deliveryStepConfig.orderStateDoneUpdate())
                 .build();
     }
 

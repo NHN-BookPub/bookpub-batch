@@ -4,23 +4,74 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.nhnacademy.bookpubbatch.repository.order.OrderMapper">
+    <!--update -->
     <update id="updateOrderCancel" parameterType="com.nhnacademy.bookpubbatch.repository.order.dto.OrderUpdateDto">
-        update bookpub_order set order_state_code_number = ${orderStateNo}
+        update bookpub_order
+        set order_state_code_number = ${orderStateNo}
         where order_number = ${orderNo}
     </update>
+
+    <update id="updateOrderShipping" parameterType="com.nhnacademy.bookpubbatch.repository.order.dto.OrderDto">
+        update bookpub_order
+        set order_state_code_number =
+                (select order_state_code_number
+                 from order_state_code
+                 where order_state_code_name = '배송중')
+        where order_number = #{orderNo}
+    </update>
+
+    <update id="updateOrderDone" parameterType="com.nhnacademy.bookpubbatch.repository.order.dto.OrderDto">
+        update bookpub_order
+        set order_state_code_number =
+                (select order_state_code_number
+                 from order_state_code
+                 where order_state_code_name = '배송완료')
+        where order_number = #{orderNo}
+    </update>
+    <!--update -->
+
+    <!--select -->
     <select id="getOrders" resultType="com.nhnacademy.bookpubbatch.repository.order.dto.OrderDto">
         select o.order_number as 'orderNo'
         from bookpub_order as o
                  left join order_state_code osc
-                       on o.order_state_code_number = osc.order_state_code_number
-        where osc.order_state_code_name = '결제대기'
-        and now() >= (o.created_at + interval 1 day)
+                           on o.order_state_code_number = osc.order_state_code_number
 
-         LIMIT #{_skiprows}, #{_pagesize}
+        <![CDATA[
+        where osc.order_state_code_name = '결제대기'
+          and now() <= (o.order_received_at + interval 1 day)
+        ]]>
+
+        LIMIT #{_skiprows}, #{_pagesize}
     </select>
     <select id="getOrderStates" resultType="com.nhnacademy.bookpubbatch.repository.order.dto.OrderStateDto">
         select order_state_code_number as 'orderStateNo'
         from order_state_code
         where order_state_code_name = '주문취소'
+    </select>
+
+    <select id="getOrderDeliveryReady" resultType="com.nhnacademy.bookpubbatch.repository.order.dto.OrderDto">
+        select o.order_number as 'orderNo'
+        from bookpub_order as o
+                 left join order_state_code osc
+                           on o.order_state_code_number = osc.order_state_code_number
+        <![CDATA[
+        where osc.order_state_code_name = '배송준비'
+          and o.order_received_at + interval 3 day
+            >= now()
+        ]]>
+        LIMIT #{_skiprows}, #{_pagesize}
+    </select>
+
+    <select id="getOrderDeliveryShipping" resultType="com.nhnacademy.bookpubbatch.repository.order.dto.OrderDto">
+        select o.order_number as 'orderNo'
+        from bookpub_order as o
+                 left join order_state_code osc
+                           on o.order_state_code_number = osc.order_state_code_number
+        <![CDATA[
+        where osc.order_state_code_name = '배송중'
+          and now() <= (o.order_received_at + interval 1 day)
+        ]]>
+        LIMIT #{_skiprows}, #{_pagesize}
     </select>
 </mapper>

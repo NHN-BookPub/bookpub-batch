@@ -3,6 +3,7 @@ package com.nhnacademy.bookpubbatch.delivery.writer;
 import com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryResponseDto;
 import com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryShippingResponseDto;
 import com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryUpdateDto;
+import com.nhnacademy.bookpubbatch.repository.order.dto.OrderDto;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.batch.MyBatisBatchItemWriter;
 import org.mybatis.spring.batch.builder.MyBatisBatchItemWriterBuilder;
@@ -19,9 +20,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DeliveryWriter {
     private final SqlSessionFactory sqlSessionFactory;
+    private final SqlSessionFactory shopSessionFactory;
 
-    public DeliveryWriter(@Qualifier("deliverySqlSessionFactory") SqlSessionFactory sqlSessionFactory) {
+    public DeliveryWriter(@Qualifier("deliverySqlSessionFactory") SqlSessionFactory sqlSessionFactory,
+                          @Qualifier("sqlSessionFactory") SqlSessionFactory shopSessionFactory) {
         this.sqlSessionFactory = sqlSessionFactory;
+        this.shopSessionFactory = shopSessionFactory;
     }
 
     /**
@@ -75,6 +79,34 @@ public class DeliveryWriter {
                 .sqlSessionFactory(sqlSessionFactory)
                 .assertUpdates(false)
                 .statementId("com.nhnacademy.bookpubbatch.repository.delivery.DeliveryMapper.updateDeliveryEnd")
+                .build();
+    }
+
+    /**
+     * 배송대기 -> 배송중으로 변경
+     *
+     * @return the my batis batch item writer
+     */
+    @Bean
+    public MyBatisBatchItemWriter<OrderDto> updateOrderDeliveryReadyToShipping(){
+        return new MyBatisBatchItemWriterBuilder<OrderDto>()
+                .sqlSessionFactory(shopSessionFactory)
+                .assertUpdates(false)
+                .statementId("com.nhnacademy.bookpubbatch.repository.order.OrderMapper.updateOrderShipping")
+                .build();
+    }
+
+    /**
+     * 배송중 -> 배송완료 변경
+     *
+     * @return the my batis batch item writer
+     */
+    @Bean
+    public MyBatisBatchItemWriter<OrderDto> updateOrderDeliveryShippingToDone() {
+        return new MyBatisBatchItemWriterBuilder<OrderDto>()
+                .sqlSessionFactory(shopSessionFactory)
+                .assertUpdates(false)
+                .statementId("com.nhnacademy.bookpubbatch.repository.order.OrderMapper.updateOrderDone")
                 .build();
     }
 }
