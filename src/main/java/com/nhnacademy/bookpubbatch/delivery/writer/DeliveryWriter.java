@@ -4,6 +4,7 @@ import com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryResponseDto;
 import com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryShippingResponseDto;
 import com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryUpdateDto;
 import com.nhnacademy.bookpubbatch.repository.order.dto.OrderDto;
+import com.nhnacademy.bookpubbatch.repository.orderproduct.dto.OrderProductDto;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.batch.MyBatisBatchItemWriter;
 import org.mybatis.spring.batch.builder.MyBatisBatchItemWriterBuilder;
@@ -34,7 +35,7 @@ public class DeliveryWriter {
      * @return the my batis batch item writer
      */
     @Bean
-    public MyBatisBatchItemWriter<DeliveryResponseDto> insertDeliveryLocationStateReady(){
+    public MyBatisBatchItemWriter<DeliveryResponseDto> insertDeliveryLocationStateReady() {
         return new MyBatisBatchItemWriterBuilder<DeliveryResponseDto>()
                 .sqlSessionFactory(sqlSessionFactory)
                 .statementId("com.nhnacademy.bookpubbatch.repository.delivery.DeliveryMapper.createDeliveryLocation")
@@ -83,12 +84,12 @@ public class DeliveryWriter {
     }
 
     /**
-     * 배송대기 -> 배송중으로 변경
+     * 주문 : 배송대기 -> 배송중으로 변경
      *
      * @return the my batis batch item writer
      */
     @Bean
-    public MyBatisBatchItemWriter<OrderDto> updateOrderDeliveryReadyToShipping(){
+    public MyBatisBatchItemWriter<OrderDto> updateOrderDeliveryReadyToShipping() {
         return new MyBatisBatchItemWriterBuilder<OrderDto>()
                 .sqlSessionFactory(shopSessionFactory)
                 .assertUpdates(false)
@@ -97,7 +98,7 @@ public class DeliveryWriter {
     }
 
     /**
-     * 배송중 -> 배송완료 변경
+     * 주문 : 배송중 -> 배송완료 변경
      *
      * @return the my batis batch item writer
      */
@@ -107,6 +108,48 @@ public class DeliveryWriter {
                 .sqlSessionFactory(shopSessionFactory)
                 .assertUpdates(false)
                 .statementId("com.nhnacademy.bookpubbatch.repository.order.OrderMapper.updateOrderDone")
+                .build();
+    }
+
+    /**
+     * 주문상품 : 배송대기 -> 배송중 변경
+     *
+     * @return the my batis batch item writer
+     */
+    @Bean
+    public MyBatisBatchItemWriter<OrderProductDto> updateOrderProductToShipping() {
+        return new MyBatisBatchItemWriterBuilder<OrderProductDto>()
+                .sqlSessionFactory(shopSessionFactory)
+                .assertUpdates(false)
+                .statementId("com.nhnacademy.bookpubbatch.repository.orderproduct.OrderProductMapper.orderProductDeliveryReadyToShipping")
+                .build();
+    }
+
+    /**
+     * 주문상품 : 배송중 -> 구매확정 대기
+     *
+     * @return the my batis batch item writer
+     */
+    @Bean
+    public MyBatisBatchItemWriter<OrderProductDto> updateOrderProductToWaitingPurchase() {
+        return new MyBatisBatchItemWriterBuilder<OrderProductDto>()
+                .sqlSessionFactory(shopSessionFactory)
+                .assertUpdates(false)
+                .statementId("com.nhnacademy.bookpubbatch.repository.orderproduct.OrderProductMapper.orderProductDeliveryShippingToWaitingPurchase")
+                .build();
+    }
+
+    /**
+     * 주문상품 : 구매확정대기 -> 구매확정
+     *
+     * @return the my batis batch item writer
+     */
+    @Bean
+    public MyBatisBatchItemWriter<OrderProductDto> updateOrderProductToPurchaseConfirmation() {
+        return new MyBatisBatchItemWriterBuilder<OrderProductDto>()
+                .sqlSessionFactory(shopSessionFactory)
+                .assertUpdates(false)
+                .statementId("com.nhnacademy.bookpubbatch.repository.orderproduct.OrderProductMapper.orderProductWaitingPurchaseToDone")
                 .build();
     }
 }

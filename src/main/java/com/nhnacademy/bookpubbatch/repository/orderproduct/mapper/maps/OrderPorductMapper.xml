@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nhnacademy.bookpubbatch.repository.orderproduct.OrderProductMapper">
+    <!-- select -->
+    <select id="getOrderProductDeliveryReady"
+            resultType="com.nhnacademy.bookpubbatch.repository.orderproduct.dto.OrderProductDto">
+        select order_product_number as 'orderProductNo'
+        from order_and_product as o
+                 inner join order_product_state_code as opsc
+                            on o.order_product_code_number = opsc.order_product_state_code_number
+                 left join bookpub_order bo
+                           on o.order_number = bo.order_number
+                 left join order_state_code osc
+                           on bo.order_state_code_number = osc.order_state_code_number
+        where order_product_state_code_name = '배송준비'
+          and osc.order_state_code_name = '배송중'
+        LIMIT #{_skiprows}, #{_pagesize}
+    </select>
+
+    <select id="getOrderProductDeliveryShipping"
+            resultType="com.nhnacademy.bookpubbatch.repository.orderproduct.dto.OrderProductDto">
+        select order_product_number as 'orderProductNo'
+        from order_and_product as o
+                 inner join order_product_state_code as opsc
+                            on o.order_product_code_number = opsc.order_product_state_code_number
+                 left join bookpub_order bo
+                           on o.order_number = bo.order_number
+                 left join order_state_code osc
+                           on bo.order_state_code_number = osc.order_state_code_number
+        where order_product_state_code_name = '배송중'
+          and osc.order_state_code_name = '배송완료'
+        LIMIT #{_skiprows}, #{_pagesize}
+    </select>
+
+    <select id="getOrderProductWaitingPurchase"
+            resultType="com.nhnacademy.bookpubbatch.repository.orderproduct.dto.OrderProductDto">
+        select order_product_number as 'orderProductNo'
+        from order_and_product as o
+        inner join order_product_state_code as opsc
+            on o.order_product_code_number = opsc.order_product_state_code_number
+        left join bookpub_order bo
+            on o.order_number = bo.order_number
+        left join order_state_code osc
+            on bo.order_state_code_number = osc.order_state_code_number
+        <![CDATA[
+        where order_product_state_code_name = '구매확정대기'
+          and bo.order_received_at + interval 7 day<= now()
+          and osc.order_state_code_name = '배송완료'
+        LIMIT #{_skiprows}, #{_pagesize}
+        ]]>
+    </select>
+    <!-- select -->
+
+    <!-- update -->
+    <update id="orderProductDeliveryReadyToShipping"
+            parameterType="com.nhnacademy.bookpubbatch.repository.orderproduct.dto.OrderProductDto">
+        update order_and_product as oap
+        set order_product_code_number = (select order_product_state_code_number
+                                         from order_product_state_code
+                                         where order_product_state_code_name = '배송중')
+        where oap.order_product_number = #{orderProductNo}
+    </update>
+
+    <update id="orderProductDeliveryShippingToWaitingPurchase"
+            parameterType="com.nhnacademy.bookpubbatch.repository.orderproduct.dto.OrderProductDto">
+        update order_and_product as oap
+        set order_product_code_number = (select order_product_state_code_number
+                                         from order_product_state_code
+                                         where order_product_state_code_name = '구매확정대기')
+        where oap.order_product_number = #{orderProductNo}
+    </update>
+
+    <update id="orderProductWaitingPurchaseToDone"
+            parameterType="com.nhnacademy.bookpubbatch.repository.orderproduct.dto.OrderProductDto">
+        update order_and_product as oap
+        set order_product_code_number = (select order_product_state_code_number
+                                         from order_product_state_code
+                                         where order_product_state_code_name = '구매확정')
+        where oap.order_product_number = #{orderProductNo}
+    </update>
+
+    <!-- update -->
+</mapper>

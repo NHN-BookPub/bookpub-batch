@@ -20,8 +20,11 @@ public class DeliveryJobConfig {
     private final DeliveryStepConfig deliveryStepConfig;
 
     /**
-     * 배송준비 -> 배송중으로 변경
-     * 배송위치 -> 옥천허브 추가
+     * 1. 배송중이 배송상태 받기
+     * 2. 배송지역 테이블에 옥천허브인 값 추가
+     * 3. 배송의 배송준비-> 배송중으로 변경
+     * 4. 주문의 배송준비 -> 배송중으로 변경
+     * 5. 주문상품의 배송준비 -> 배송중으로 변경
      *
      * @return the job
      */
@@ -32,12 +35,15 @@ public class DeliveryJobConfig {
                 .next(deliveryStepConfig.deliveryLocationCreate())
                 .next(deliveryStepConfig.deliveryLocationUpdate())
                 .next(deliveryStepConfig.orderStateShippingUpdate())
+                .next(deliveryStepConfig.orderProductStateShippingUpdate())
                 .build();
     }
 
     /**
-     * 배송중 -> 배송완료 변경
-     * 배송위치 -> 요청한 위치로 도착
+     * 1. 배송지역 테이블에 도착지역 값 추가
+     * 2. 배송의 배송중 -> 배송완료로 변경
+     * 3. 주문의 배송중 -> 배송완료로 변경
+     * 4. 주문상품의 배송중 -> 구매확정 대기 상태로 변경
      *
      * @return the job
      */
@@ -47,6 +53,19 @@ public class DeliveryJobConfig {
                 .start(deliveryStepConfig.deliveryStateEnd())
                 .next(deliveryStepConfig.deliveryStateEndUpdate())
                 .next(deliveryStepConfig.orderStateDoneUpdate())
+                .next(deliveryStepConfig.orderProductStateWaitingPurchase())
+                .build();
+    }
+
+    /**
+     * 1. 주문상품 -> 구매확정대기 -> 구매확정으로 변경
+     *
+     * @return the job
+     */
+    @Bean
+    public Job purchaseWaitingToDone(){
+        return jobBuilderFactory.get("purchaseWaitingToDone" + LocalDateTime.now())
+                .start(deliveryStepConfig.orderProductPurchaseConfirmation())
                 .build();
     }
 
