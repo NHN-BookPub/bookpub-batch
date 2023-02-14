@@ -50,6 +50,7 @@ public class DeliveryJobConfig {
     @Bean
     public Job deliveryEnd(){
         return jobBuilderFactory.get("delvieryEnd" + LocalDateTime.now())
+                .preventRestart()
                 .start(deliveryStepConfig.deliveryStateEnd())
                 .next(deliveryStepConfig.deliveryStateEndUpdate())
                 .next(deliveryStepConfig.orderStateDoneUpdate())
