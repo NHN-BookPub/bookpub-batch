@@ -7,6 +7,7 @@ import com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryShippingRespo
 import com.nhnacademy.bookpubbatch.repository.delivery.dto.DeliveryStateDto;
 import com.nhnacademy.bookpubbatch.repository.member.dto.MemberDto;
 import com.nhnacademy.bookpubbatch.repository.order.dto.OrderDto;
+import com.nhnacademy.bookpubbatch.repository.order.dto.OrderPointDto;
 import com.nhnacademy.bookpubbatch.repository.order.dto.OrderStateDto;
 import com.nhnacademy.bookpubbatch.repository.orderproduct.dto.OrderProductDto;
 import com.nhnacademy.bookpubbatch.repository.tier.dto.TierDto;
@@ -66,7 +67,8 @@ public class MybatisConfig {
                 DeliveryStateDto.class.getName(),
                 DeliveryResponseDto.class.getName(),
                 DeliveryShippingResponseDto.class.getName(),
-                OrderProductDto.class.getName());
+                OrderProductDto.class.getName(),
+                OrderPointDto.class.getName());
     }
 
 }

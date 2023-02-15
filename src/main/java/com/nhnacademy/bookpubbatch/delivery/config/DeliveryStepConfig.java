@@ -218,26 +218,6 @@ public class DeliveryStepConfig {
     }
 
     /**
-     * 주문상품 : 상태값 구매확정대기 -> 구매확정
-     *
-     * @return the step
-     */
-    @JobScope
-    @Bean
-    public Step orderProductPurchaseConfirmation(){
-        return stepBuilderFactory.get("구매확정대기 + 7일 -> 구매확정으로 변경")
-                .<OrderProductDto, OrderProductDto>chunk(CHUNK_SIZE)
-                .reader(reader.orderProductStateWaitingReader())
-                .writer(writer.updateOrderProductToPurchaseConfirmation())
-                .faultTolerant()
-                .retryLimit(3)
-                .retry(DeadlockLoserDataAccessException.class)
-                .listener(loggingListener)
-                .build();
-    }
-
-
-    /**
      * 데이터 공유를 위한 Listener
      *
      * @return 데이터 공유에 필요한 key 값을 가진 ExecutionContextPromotionListener 가 반환 됩니다.

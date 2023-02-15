@@ -139,17 +139,4 @@ public class DeliveryWriter {
                 .build();
     }
 
-    /**
-     * 주문상품 : 구매확정대기 -> 구매확정
-     *
-     * @return the my batis batch item writer
-     */
-    @Bean
-    public MyBatisBatchItemWriter<OrderProductDto> updateOrderProductToPurchaseConfirmation() {
-        return new MyBatisBatchItemWriterBuilder<OrderProductDto>()
-                .sqlSessionFactory(shopSessionFactory)
-                .assertUpdates(false)
-                .statementId("com.nhnacademy.bookpubbatch.repository.orderproduct.OrderProductMapper.orderProductWaitingPurchaseToDone")
-                .build();
-    }
 }
