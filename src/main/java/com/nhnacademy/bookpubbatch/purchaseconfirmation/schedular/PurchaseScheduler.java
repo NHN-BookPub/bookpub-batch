@@ -28,14 +28,14 @@ public class PurchaseScheduler {
 
 
     /**
-     * JoLauncher 를 통해 등록된 job 을 특정시간에 실행시킨다.
-     * 매월 마지막날 적용 11 시에진행
-     * 초 분 시 일 월 주 년
-     * 0 0 11 L * ?  <-- 원래넣어야할  값
-     * 테스트용으로 매일 12시에 진행
+     * 매일 23시 30분 0초에 실행.
+     * 1. 포인트내역에 회원이 적용할포인트 추가
+     * 2. 회원의 포인트 업데이트
+     * 3. 해당 주문상품의 상태를 구매확정으로 변경
+     * 4. 해당 주문의 상태를 구매확정으로 변경
      */
     @Scheduled(cron = "0 30 23 * * *")
-    public void runCouponBatchJob() {
+    public void purchaseRunner() {
         try {
             JobParameters jobParameters = new JobParametersBuilder().toJobParameters();
             jobLauncher.run(jobConfig.purchaseConfirmation(), jobParameters);
