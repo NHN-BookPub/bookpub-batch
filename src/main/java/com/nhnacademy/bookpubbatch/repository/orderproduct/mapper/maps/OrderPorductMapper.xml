@@ -39,19 +39,24 @@
             resultType="com.nhnacademy.bookpubbatch.repository.orderproduct.dto.OrderProductDto">
         select order_product_number as 'orderProductNo'
         from order_and_product as o
-        inner join order_product_state_code as opsc
-            on o.order_product_code_number = opsc.order_product_state_code_number
-        left join bookpub_order bo
-            on o.order_number = bo.order_number
-        left join order_state_code osc
-            on bo.order_state_code_number = osc.order_state_code_number
+                 inner join order_product_state_code as opsc
+                            on o.order_product_code_number = opsc.order_product_state_code_number
+                 left join bookpub_order bo
+                           on o.order_number = bo.order_number
+                 inner join member m
+                            on bo.member_number = m.member_number
+                 left join order_state_code osc
+                           on bo.order_state_code_number = osc.order_state_code_number
         <![CDATA[
         where order_product_state_code_name = '구매확정대기'
-          and bo.order_received_at + interval 7 day<= now()
-          and osc.order_state_code_name = '배송완료'
+            and bo.order_received_at + interval 7 day <= now()
+            and osc.order_state_code_name = '배송완료'
+           or osc.order_state_code_name = '구매확정'
         LIMIT #{_skiprows}, #{_pagesize}
         ]]>
     </select>
+
+
     <!-- select -->
 
     <!-- update -->

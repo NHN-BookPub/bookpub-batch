@@ -57,17 +57,4 @@ public class DeliveryJobConfig {
                 .next(deliveryStepConfig.orderProductStateWaitingPurchase())
                 .build();
     }
-
-    /**
-     * 1. 주문상품 -> 구매확정대기 -> 구매확정으로 변경
-     *
-     * @return the job
-     */
-    @Bean
-    public Job purchaseWaitingToDone(){
-        return jobBuilderFactory.get("purchaseWaitingToDone" + LocalDateTime.now())
-                .start(deliveryStepConfig.orderProductPurchaseConfirmation())
-                .build();
-    }
-
 }

@@ -57,21 +57,4 @@ public class DeliveryScheduler {
             log.error(e.getMessage());
         }
     }
-
-
-    /**
-     * 구매확정대기 -> 구매확정 변경
-     *
-     */
-    @Scheduled(cron = "* 58 23 * * *", zone = "Asia/Seoul")
-    public void runOrderPurchaseToDone(){
-        try {
-            JobParameters jobParameters = new JobParametersBuilder()
-                    .toJobParameters();
-            jobLauncher.run(deliveryJobConfig.purchaseWaitingToDone(), jobParameters);
-        } catch (JobExecutionAlreadyRunningException | JobInstanceAlreadyCompleteException
-                 | JobParametersInvalidException | JobRestartException e) {
-            log.error(e.getMessage());
-        }
-    }
 }

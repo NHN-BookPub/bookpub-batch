@@ -4,6 +4,10 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.nhnacademy.bookpubbatch.repository.order.OrderMapper">
+    <insert id="insertPointHistory" parameterType="com.nhnacademy.bookpubbatch.repository.order.dto.OrderPointDto">
+        insert point_history
+        values (null, #{memberNo}, #{point}, #{reason}, 1, now());
+    </insert>
     <!--update -->
     <update id="updateOrderCancel" parameterType="com.nhnacademy.bookpubbatch.repository.order.dto.OrderUpdateDto">
         update bookpub_order
@@ -26,6 +30,15 @@
                 (select order_state_code_number
                  from order_state_code
                  where order_state_code_name = '배송완료')
+        where order_number = #{orderNo}
+    </update>
+
+    <update id="updatePurchaseDone" parameterType="com.nhnacademy.bookpubbatch.repository.order.dto.OrderPointDto">
+        update bookpub_order
+        set order_state_code_number =
+                (select order_state_code_number
+                 from order_state_code
+                 where order_state_code_name = '구매확정')
         where order_number = #{orderNo}
     </update>
     <!--update -->
@@ -73,5 +86,54 @@
           and now() <= (o.order_received_at + interval 1 day)
         ]]>
         LIMIT #{_skiprows}, #{_pagesize}
+    </select>
+
+    <select id="getOrderPoint" resultType="com.nhnacademy.bookpubbatch.repository.order.dto.OrderPointDto">
+        select distinct oap.order_product_point_save  as 'point',
+                        o.member_number               as 'memberNo',
+                        o.order_number                as 'orderNo',
+                        oap.order_product_reason_name as 'reason'
+        from bookpub_order as o
+                 inner join member m
+                            on o.member_number = m.member_number
+                 left join order_and_product oap
+                           on o.order_number = oap.order_number
+                 inner join order_product_state_code opsc
+                            on oap.order_product_code_number = opsc.order_product_state_code_number
+                 left join order_state_code osc
+                           on o.order_state_code_number = osc.order_state_code_number
+
+        <![CDATA[
+        where opsc.order_product_state_code_name = '구매확정대기'
+            and o.order_received_at + interval 7 day <= now()
+            and osc.order_state_code_name = '배송완료'
+           or osc.order_state_code_name = '구매확정'
+        LIMIT #{_skiprows}, #{_pagesize}
+        ]]>
+    </select>
+
+
+    <select id="getOrderDone" resultType="com.nhnacademy.bookpubbatch.repository.order.dto.OrderPointDto">
+        select distinct oap.order_product_point_save  as 'point',
+                        o.member_number               as 'memberNo',
+                        o.order_number                as 'orderNo',
+                        oap.order_product_reason_name as 'reason'
+        from bookpub_order as o
+                 inner join member m
+                            on o.member_number = m.member_number
+                 left join order_and_product oap
+                           on o.order_number = oap.order_number
+                 inner join order_product_state_code opsc
+                            on oap.order_product_code_number = opsc.order_product_state_code_number
+                 left join order_state_code osc
+                           on o.order_state_code_number = osc.order_state_code_number
+
+        <![CDATA[
+        where opsc.order_product_state_code_name = '구매확정'
+          and o.order_received_at + interval 7 day <= now()
+            and osc.order_state_code_name = '배송완료'
+           or osc.order_state_code_name = '구매확정'
+        LIMIT #{_skiprows}, #{_pagesize}
+        ]]>
     </select>
 </mapper>

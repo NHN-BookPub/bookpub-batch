@@ -129,17 +129,5 @@ public class DeliveryReader {
                 .build();
     }
 
-    /**
-     * 구매확정 대기 + 7일 상품 읽어오기.
-     *
-     * @return the my batis paging item reader
-     */
-    @Bean
-    public MyBatisPagingItemReader<OrderProductDto> orderProductStateWaitingReader() {
-        return new MyBatisPagingItemReaderBuilder<OrderProductDto>()
-                .sqlSessionFactory(shopSessionFactory)
-                .queryId("com.nhnacademy.bookpubbatch.repository.orderproduct.OrderProductMapper.getOrderProductWaitingPurchase")
-                .pageSize(PAGE_SIZE)
-                .build();
-    }
+
 }
