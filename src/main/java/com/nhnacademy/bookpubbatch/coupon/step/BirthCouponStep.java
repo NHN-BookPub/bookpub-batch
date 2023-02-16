@@ -51,7 +51,7 @@ public class BirthCouponStep {
                 .name("birthDayDtoItemReader")
                 .dataSource(dataSource)
                 .queryProvider(pagingQueryProvider(dataSource))
-                .pageSize(1000)
+                .pageSize(10)
                 .rowMapper(new BirthMemberDtoMapper())
                 .build();
     }
@@ -81,7 +81,7 @@ public class BirthCouponStep {
     @Bean
     public Step sendBirthCouponStep(@Qualifier("shopDb") DataSource dataSource) throws Exception {
         return stepBuilderFactory.get("sendBirthCouponStep")
-                .<BirthMemberDto, BirthMemberDto>chunk(1000)
+                .<BirthMemberDto, BirthMemberDto>chunk(10)
                 .reader(birthMemberDtoItemReader(dataSource))
                 .writer(birthMemberDtoItemWriter(dataSource))
                 .build();
