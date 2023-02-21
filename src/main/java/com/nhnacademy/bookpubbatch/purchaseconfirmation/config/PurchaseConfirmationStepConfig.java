@@ -1,6 +1,7 @@
 package com.nhnacademy.bookpubbatch.purchaseconfirmation.config;
 
 import com.nhnacademy.bookpubbatch.listener.LoggingListener;
+import com.nhnacademy.bookpubbatch.purchaseconfirmation.processor.PurchaseProcessor;
 import com.nhnacademy.bookpubbatch.purchaseconfirmation.reader.PurchaseReader;
 import com.nhnacademy.bookpubbatch.purchaseconfirmation.writer.PurchaseWriter;
 import com.nhnacademy.bookpubbatch.repository.order.dto.OrderPointDto;
@@ -25,6 +26,7 @@ import org.springframework.dao.DeadlockLoserDataAccessException;
 public class PurchaseConfirmationStepConfig {
     private final StepBuilderFactory stepBuilderFactory;
     private final PurchaseReader reader;
+    private final PurchaseProcessor purchaseProcessor;
     private final PurchaseWriter writer;
     private final LoggingListener loggingListener;
     private static final Integer CHUNK_SIZE = 10;
@@ -57,6 +59,7 @@ public class PurchaseConfirmationStepConfig {
         return stepBuilderFactory.get("회원의 포인트 업데이트")
                 .<OrderPointDto, OrderPointDto>chunk(CHUNK_SIZE)
                 .reader(reader.getOrderPointReader())
+                .processor(purchaseProcessor)
                 .faultTolerant()
                 .retry(DeadlockLoserDataAccessException.class)
                 .retryLimit(3)
