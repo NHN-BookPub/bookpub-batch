@@ -1,6 +1,7 @@
 package com.nhnacademy.bookpubbatch.repository.orderproduct;
 
 import com.nhnacademy.bookpubbatch.repository.orderproduct.dto.OrderProductDto;
+import com.nhnacademy.bookpubbatch.repository.orderproduct.dto.ProductDto;
 import java.util.List;
 
 /**
@@ -55,5 +56,19 @@ public interface OrderProductMapper {
      * @param dto the dto
      */
     void orderProductWaitingPurchaseToDone(OrderProductDto dto);
+
+    /**
+     * 배스트 셀러가 될 상품들을 조회합니다.
+     *
+     * @return the best product
+     */
+    List<ProductDto> getBestProduct();
+
+    /**
+     * 베스트 셀러로 변경합니다.
+     *
+     * @param productDto 베스트셀러가 될 상품정보가 들어옵니다.
+     */
+    void updateBestSeller(ProductDto productDto);
 
 }

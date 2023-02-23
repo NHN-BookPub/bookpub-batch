@@ -55,6 +55,23 @@
         LIMIT #{_skiprows}, #{_pagesize}
         ]]>
     </select>
+    <select id="getBestProduct"
+            resultType="com.nhnacademy.bookpubbatch.repository.orderproduct.dto.ProductDto">
+        select oap.product_number as 'productNo',
+               count(*) as 'count'
+        from order_and_product as oap
+                 inner join bookpub_order as o
+                            on oap.order_number = o.order_number
+                 left join order_product_state_code as opsc
+                           on opsc.order_product_state_code_number = oap.order_product_code_number
+      <![CDATA[
+        where opsc.order_product_state_code_name = '구매확정'
+          and o.created_at <= now()
+          and o.created_at >= now() - interval 1 month
+        group by oap.product_number
+        LIMIT 1;
+        ]]>
+    </select>
 
 
     <!-- select -->
@@ -85,6 +102,17 @@
                                          from order_product_state_code
                                          where order_product_state_code_name = '구매확정')
         where oap.order_product_number = #{orderProductNo}
+    </update>
+    <update id="updateBestSeller"
+            parameterType="com.nhnacademy.bookpubbatch.repository.orderproduct.dto.ProductDto">
+        update product
+        set product_type_code_number =
+                (select ptsc.product_type_state_code_number
+                 from product_type_state_code as ptsc
+                 where ptsc.product_type_state_code_name = '베스트셀러')
+        where product_number = #{productNo};
+
+
     </update>
 
     <!-- update -->
