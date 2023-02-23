@@ -16,4 +16,11 @@ public class OrderPointDto {
     private Long memberNo;
     private Long orderNo;
     private String reason;
+
+    /**
+     * null 값인 point 를 0 으로 만들어줌.
+     */
+    public void zeroPoint() {
+        this.point = 0L;
+    }
 }
